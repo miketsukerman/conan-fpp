@@ -28,8 +28,7 @@ class FppConan(ConanFile):
     scm = {
          "type": "git",
          "subfolder": "fpp",
-        #  "url": "https://github.com/miketsukerman/fpp.git",
-         "url": "file:///home/michael/github/fpp1",
+         "url": "https://github.com/miketsukerman/fpp.git",
          "revision": "master"
     }
   

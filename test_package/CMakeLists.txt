@@ -23,14 +23,16 @@ find_package(fp REQUIRED)
 set(TARGET example)
 add_executable(${TARGET} example.cpp)
 
-target_link_libraries(
-  example
-  fp::fp
-  CONAN_PKG::catch2
-  Boost::program_options
-  Boost::filesystem
-  Boost::system
-  Boost::log
-  Boost::log_setup)
+set(deps
+    fp::fp
+    fpg::fpg
+    CONAN_PKG::catch2
+    Boost::program_options
+    Boost::filesystem
+    Boost::system
+    Boost::log
+    Boost::log_setup)
 
-  catch_discover_tests(${TARGET})
+target_link_libraries(example ${deps})
+
+catch_discover_tests(${TARGET})
