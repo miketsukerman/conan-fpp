@@ -12,8 +12,8 @@ TEST_CASE("Example test for conan package", "")
 {
     constexpr auto inputFileName = "example.fidl";
 
-    SourceFileManager sourceFilesManager;
-    sourceFilesManager.addInputFile(inputFileName);
+    auto sourceFilesManager = std::make_shared<SourceFileManager>();
+    sourceFilesManager->addInputFile(inputFileName);
     ASTConstructor abstractSyntaxTree(sourceFilesManager);
 
     abstractSyntaxTree.build();
