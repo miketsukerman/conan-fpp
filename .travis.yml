@@ -1,0 +1,150 @@
+language: c++
+
+matrix:
+  include:
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - lcov
+          update: true
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+            - lcov
+          update: true
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+
+    # TODO: enable after fixing CI build issues
+    # - os: linux
+    #   dist: bionic
+    #   compiler: gcc
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - g++-9
+    #         - lcov
+    #       update: true
+    #   env:
+    #     - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+
+    - os: linux
+      dist: bionic
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-bionic-6.0
+          packages:
+            - clang-6.0
+            - libc++-dev
+            - lcov
+          update: true
+      env:
+        - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+
+    # TODO: enable after fixing CI build issues with std optional
+    # - os: linux
+    #   dist: xenial
+    #   compiler: clang
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-xenial-7
+    #       packages:
+    #         - clang-7
+    #         - libc++-dev
+    #         - lcov
+    #       update: true
+    #   env:
+    #     - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+
+    # - os: linux
+    #   dist: xenial
+    #   compiler: clang
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-xenial-8
+    #       packages:
+    #         - clang-8
+    #         - libc++-dev
+    #         - lcov
+    #       update: true
+    #   env:
+    #     - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
+
+    # - os: linux
+    #   dist: xenial
+    #   compiler: clang
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+    #           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    #       packages:
+    #         - clang-9
+    #         - libc++-dev
+    #         - lcov
+    #       update: true
+    #   env:
+    #     - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+install:
+  # haskell package manager
+  - sudo apt-get -y install cabal-install git doxygen graphviz texlive-latex-recommended python3-pip python3-setuptools
+  # update cabal package list
+  - cabal update
+  # install haskell doctest
+  - cabal install doctest alex happy
+  # codecov
+  - sudo pip3 install codecov
+  # conan
+  - sudo pip3 install conan
+  # sphinx + doxygen support + markdown support
+  - sudo pip3 install sphinx breathe recommonmark
+  # add conan bintray repo
+  - conan remote add bintray-conan https://api.bintray.com/conan/bincrafters/public-conan
+  # setup cmake
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+  - |
+    if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
+      CMAKE_URL="http://cmake.org/files/v3.13/cmake-3.13.0-Darwin-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+
+      git clone https://github.com/miketsukerman/bnfc.git
+      cd bnfc && git checkout throw-runtime-exception
+      make install
+    fi
+
+before_script:
+  - cd ${TRAVIS_BUILD_DIR}
+
+script:
+  - conan create .
