@@ -10,11 +10,13 @@ class FppConan(ConanFile):
     description = "Franca plus parser"
     topics = ("franca", "parser", "genivi")
     settings = "os", "compiler", "build_type", "arch"
+    requires = "bison/3.3.2@bincrafters/stable", "flex/2.6.4@bincrafters/stable", "CLI11/1.8.0@cliutils/stable", "spdlog/[>=1.4.1]"
     generators = "cmake"
     options = {
         "enable_testsuite": [True, False],
         "enable_docs": [True, False],
         "enable_python": [True, False],
+        "enable_java": [True, False],
         "code_coverage": [True, False],
         "python_version": ["3.5", "3.6", "3.7", "3.8", "auto"]
     }
@@ -22,8 +24,11 @@ class FppConan(ConanFile):
         "enable_testsuite": True,
         "enable_docs": False,
         "enable_python": False,
+        "enable_java": False,
         "code_coverage": False,
-        "python_version": "auto"
+        "python_version": "auto",
+        "fmt:header_only" : True,
+        "spdlog:header_only" : True
     }
     scm = {
          "type": "git",
@@ -37,10 +42,9 @@ class FppConan(ConanFile):
             self.options.python_version = self.get_current_python_version()
 
     def requirements(self):
-        self.requires("bison/3.3.2@bincrafters/stable")
-        self.requires("flex/2.6.4@bincrafters/stable")
-        self.requires("boost/1.72.0")
-
+        if self.options.enable_java:
+            self.requires("jni.hpp/4.0.1")
+            self.requires("java_installer/9.0.0@bincrafters/stable")
         if self.options.enable_testsuite:
             self.requires("catch2/2.11.1")
         if self.options.enable_python:

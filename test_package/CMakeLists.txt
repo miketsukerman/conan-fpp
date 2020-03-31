@@ -11,6 +11,8 @@ conan_define_targets()
 include(CTest)
 include(Catch)
 
+find_package(CLI11 REQUIRED)
+
 find_package(
   Boost REQUIRED
   COMPONENTS program_options filesystem system log log_setup
@@ -26,12 +28,8 @@ add_executable(${TARGET} example.cpp)
 set(deps
     fp::fp
     fpg::fpg
-    CONAN_PKG::catch2
-    Boost::program_options
-    Boost::filesystem
-    Boost::system
-    Boost::log
-    Boost::log_setup)
+    CLI11::CLI11
+    CONAN_PKG::catch2)
 
 target_link_libraries(example ${deps})
 
