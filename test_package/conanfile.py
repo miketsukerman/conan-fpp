@@ -6,7 +6,7 @@ from conans import ConanFile, CMake, RunEnvironment, tools
 class FppTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "virtualrunenv"
-    requires = "fpp/1.0.0", "catch2/2.11.1"
+    requires = "fpp/1.0.0"
 
     def build(self):
         cmake = CMake(self)
@@ -20,5 +20,6 @@ class FppTestConan(ConanFile):
 
     def test(self):
         if not tools.cross_building(self.settings):
+            inputFile="{}/example.fidl".format(os.getcwd())
             os.chdir("bin")
-            self.run(".%sexample" % os.sep, run_environment=True)
+            self.run(".{}example -i {} -g test -o test".format(os.sep,inputFile), run_environment=True)

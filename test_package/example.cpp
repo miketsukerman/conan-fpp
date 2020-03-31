@@ -1,23 +1,25 @@
-#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include <iostream>
 
-#include <catch2/catch.hpp>
+#include "parser/CommandLineParser.h"
 
-#include <parser/SourceFileManager.h>
-#include <parser/ASTConstructor.h>
+using namespace fpp;
 
-using namespace fpp::parser;
-
-TEST_CASE("Example test for conan package", "")
+int main(int argc, char** argv)
 {
-    constexpr auto inputFileName = "example.fidl";
+    parser::CommandLineParser parser("Franca+ IDL parser");
 
-    auto sourceFilesManager = std::make_shared<SourceFileManager>();
-    sourceFilesManager->addInputFile(inputFileName);
-    ASTConstructor abstractSyntaxTree(sourceFilesManager);
+    try {
+        parser.parse(argc, argv);
 
-    abstractSyntaxTree.build();
-    auto parseErrors = abstractSyntaxTree.errors();
+        parser.addGenerator("test", [](std::string outputFile, const fpp::ast::types::NodePtr& ast ) {
+            std::cout << "test" << std::endl;
+        });
 
-    REQUIRE(parseErrors.size() == 0);
+        parser.process();
+
+    } catch (const CLI::ParseError &e) {
+        parser.exit(e);
+    }
+
+    return 0;
 }

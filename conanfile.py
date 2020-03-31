@@ -10,7 +10,7 @@ class FppConan(ConanFile):
     description = "Franca plus parser"
     topics = ("franca", "parser", "genivi")
     settings = "os", "compiler", "build_type", "arch"
-    requires = "bison/3.3.2@bincrafters/stable", "flex/2.6.4@bincrafters/stable", "CLI11/1.8.0@cliutils/stable", "spdlog/[>=1.4.1]"
+    requires = "bison/3.3.2@bincrafters/stable", "flex/2.6.4@bincrafters/stable","CLI11/1.8.0@cliutils/stable"
     generators = "cmake"
     options = {
         "enable_testsuite": [True, False],
@@ -42,6 +42,8 @@ class FppConan(ConanFile):
             self.options.python_version = self.get_current_python_version()
 
     def requirements(self):
+        self.requires("spdlog/[>=1.4.1]",private=True)
+
         if self.options.enable_java:
             self.requires("jni.hpp/4.0.1")
             self.requires("java_installer/9.0.0@bincrafters/stable")
@@ -55,7 +57,9 @@ class FppConan(ConanFile):
         cmake.definitions["ENABLE_DOCS"] = self.options.enable_docs
         cmake.definitions["ENABLE_PYTHON_SUPPORT"] = self.options.enable_python
         cmake.definitions["ENABLE_TESTSUITE"] = self.options.enable_testsuite
+        cmake.definitions["ENABLE_JAVA_SUPPORT"] = self.options.enable_java
         cmake.definitions["CODE_COVERAGE"] = self.options.code_coverage
+        cmake.definitions["ENABLE_TESTSUITE"] = self.options.enable_testsuite
 
         if self.options.enable_python:
             cmake.definitions["PYTHON_SITE_PACKAGES_DIRECTORY"] = os.path.join(self.package_folder, "lib")
