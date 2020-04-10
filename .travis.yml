@@ -116,11 +116,7 @@ before_install:
 
 install:
   # haskell package manager
-  - sudo apt-get -y install cabal-install git doxygen graphviz texlive-latex-recommended python3-pip python3-setuptools
-  # update cabal package list
-  - cabal update
-  # install haskell doctest
-  - cabal install doctest alex happy
+  - sudo apt-get -y install alex happy git doxygen graphviz texlive-latex-recommended python3-pip python3-setuptools
   # codecov
   - sudo pip3 install codecov
   # conan
@@ -129,6 +125,8 @@ install:
   - sudo pip3 install sphinx breathe recommonmark
   # add conan bintray repo
   - conan remote add bintray-conan https://api.bintray.com/conan/bincrafters/public-conan
+  # add conan bintray personal repo
+  - conan remote add bintray-conan-personal https://api.bintray.com/conan/miketsukerman/fpp 
   # setup cmake
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
@@ -137,14 +135,10 @@ install:
       CMAKE_URL="http://cmake.org/files/v3.13/cmake-3.13.0-Darwin-x86_64.tar.gz"
       mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-
-      git clone https://github.com/miketsukerman/bnfc.git
-      cd bnfc && git checkout throw-runtime-exception
-      make install
     fi
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
 
 script:
-  - conan create .
+  - conan create --build missing .

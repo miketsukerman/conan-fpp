@@ -10,7 +10,7 @@ class FppConan(ConanFile):
     description = "Franca plus parser"
     topics = ("franca", "parser", "genivi")
     settings = "os", "compiler", "build_type", "arch"
-    requires = "bison/3.3.2@bincrafters/stable", "flex/2.6.4@bincrafters/stable","CLI11/1.8.0@cliutils/stable"
+    requires = "CLI11/1.8.0@cliutils/stable", "fpg/1.0.0"
     generators = "cmake"
     options = {
         "enable_testsuite": [True, False],
