@@ -14,6 +14,7 @@ endif()
 
 find_package(Threads)
 
+find_package(CLI11 REQUIRED)
 find_package(fpg REQUIRED)
 find_package(fp REQUIRED)
 
